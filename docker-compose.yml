@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mongodb-proshopv2:
+    image: mongo:latest
+    container_name: mongodb-proshopv2
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+    - MONGO_INITDB_ROOT_USERNAME=admin
+    - MONGO_INITDB_ROOT_PASSWORD=123
+
+  backend-proshopv2:
+    image: proshopv2-backend:v3
+    container_name: backend-proshopv2
+    ports:
+      - "5000:5000"
+    environment:
+      # - NODE_ENV=production
+      - PORT=${PORT}
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - mongodb-proshopv2
+
+  frontend-proshopv2:
+    image: proshopv2-frontend:v3
+    container_name: frontend-proshopv2
+    ports:
+      - "3001:3000"
+
+volumes:
+  mongo-data:
