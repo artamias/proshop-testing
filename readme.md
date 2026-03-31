@@ -21,3 +21,6 @@ This project demonstrates how a traditional web application can be transformed i
 - Automation: Ansible
 
 ---
+
+## Acknowledgements
+- Original Repository: https://github.com/bradtraversy/proshop-v2
