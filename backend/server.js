@@ -17,9 +17,8 @@ connectDB();
 
 const app = express();
 
-// tambahkan cors sebelum middleware lain
 app.use(cors({
-  origin: 'http://192.168.65.128:3001',
+  origin: 'http://192.168.65.128:8081', //change with IP nginx conf
   credentials: true,
 }));
 
@@ -35,6 +34,15 @@ app.use('/api/upload', uploadRoutes);
 app.get('/api/config/paypal', (req, res) =>
   res.send({ clientId: process.env.PAYPAL_CLIENT_ID })
 );
+
+// Tambah endpoint untuk cek load balancing
+app.get('/api/instance', (req, res) => {
+  res.json({
+    instance: process.env.HOSTNAME || 'unknown',
+    pid: process.pid,
+    timestamp: new Date().toISOString()
+  });
+});
 
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();

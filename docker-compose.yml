@@ -6,17 +6,35 @@ services:
     container_name: mongodb-proshopv2
     volumes:
       - mongo-data:/data/db
-    ports:
-      - "27017:27017"
+    expose:
+      - 27017
     environment:
-    - MONGO_INITDB_ROOT_USERNAME=admin
-    - MONGO_INITDB_ROOT_PASSWORD=123
+    - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+    - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
-  backend-proshopv2:
-    image: proshopv2-backend:v3
-    container_name: backend-proshopv2
-    ports:
-      - "5000:5000"
+  backend-proshopv2-1:
+    image: proshopv2-backend:v4
+    container_name: backend-proshopv2-1
+    expose:
+      - 5000
+    environment:
+      - PORT=${PORT}
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - mongodb-proshopv2
+
+  backend-proshopv2-2:
+    image: proshopv2-backend:v4
+    container_name: backend-proshopv2-2
+    expose:
+      - 5000
     environment:
       # - NODE_ENV=production
       - PORT=${PORT}
@@ -25,11 +43,30 @@ services:
     depends_on:
       - mongodb-proshopv2
 
-  frontend-proshopv2:
-    image: proshopv2-frontend:v3
-    container_name: frontend-proshopv2
+  frontend-proshopv2-1:
+    image: proshopv2-frontend:v4
+    container_name: frontend-proshopv2-1
+    expose:
+      - 3000
+
+  frontend-proshopv2-2:
+    image: proshopv2-frontend:v4
+    container_name: frontend-proshopv2-2
+    expose:
+      - 3000
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proshopv2
     ports:
-      - "3001:3000"
+      - "8081:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend-proshopv2-1
+      - backend-proshopv2-2
+      - frontend-proshopv2-1
+      - frontend-proshopv2-2
 
 volumes:
   mongo-data:

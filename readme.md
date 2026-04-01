@@ -16,7 +16,7 @@ This project demonstrates how a traditional web application can be transformed i
 ### Infrastructure
 - Containerization: Docker
 - Multi-container orchestration: Docker Compose
-- Reverse Proxy: NGINX
+- Reverse Proxy and Load Balancer: NGINX
 - Orchestration: Kubernetes (next step)
 - Automation: Ansible
 
